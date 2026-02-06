@@ -1,0 +1,16 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# ZIP files (optional but recommended)
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db

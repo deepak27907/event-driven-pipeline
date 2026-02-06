@@ -1,3 +1,15 @@
+data "archive_file" "fetch_public_api_zip" {
+  type        = "zip"
+  source_file = "../lambda/fetch_public_api.py"
+  output_path = "${path.module}/fetch_public_api.zip"
+}
+
+data "archive_file" "daily_summary_zip" {
+  type        = "zip"
+  source_file = "../lambda/daily_summary.py"
+  output_path = "${path.module}/daily_summary.zip"
+}
+
 ############################
 # S3 BUCKET
 ############################
@@ -46,23 +58,19 @@ resource "aws_lambda_function" "fetch_public_api" {
   runtime       = "python3.10"
   handler       = "fetch_public_api.lambda_handler"
   role          = aws_iam_role.lambda_role.arn
-  filename      = "../lambda/fetch_public_api.zip"
-  timeout       = 30
+
+  filename         = data.archive_file.fetch_public_api_zip.output_path
+  source_code_hash = data.archive_file.fetch_public_api_zip.output_base64sha256
+
+  timeout = 30
 
   environment {
     variables = {
       BUCKET_NAME = var.bucket_name
     }
   }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_basic_logs,
-    aws_iam_role_policy_attachment.lambda_s3_access
-  ]
-
-  source_code_hash = filebase64sha256("../lambda/fetch_public_api.zip")
-
 }
+
 
 
 ############################
@@ -73,21 +81,16 @@ resource "aws_lambda_function" "daily_summary" {
   runtime       = "python3.10"
   handler       = "daily_summary.lambda_handler"
   role          = aws_iam_role.lambda_role.arn
-  filename      = "../lambda/daily_summary.zip"
-  timeout       = 60
+
+  filename         = data.archive_file.daily_summary_zip.output_path
+  source_code_hash = data.archive_file.daily_summary_zip.output_base64sha256
+
+  timeout = 60
 
   environment {
     variables = {
       BUCKET_NAME = var.bucket_name
     }
   }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_basic_logs,
-    aws_iam_role_policy_attachment.lambda_s3_access
-  ]
-
-  source_code_hash = filebase64sha256("../lambda/daily_summary.zip")
-
 }
 

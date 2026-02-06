@@ -22,8 +22,12 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
+        env:
+          TF_VAR_bucket_name: public-api-ingestion-bucket-deepak
         run: terraform plan
 
       - name: Terraform Apply
         working-directory: terraform
+        env:
+          TF_VAR_bucket_name: public-api-ingestion-bucket-deepak
         run: terraform apply -auto-approve
